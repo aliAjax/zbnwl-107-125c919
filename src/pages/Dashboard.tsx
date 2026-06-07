@@ -68,7 +68,6 @@ export default function Dashboard() {
   const getHostById = (id: string) => hosts.find((h) => h.id === id);
 
   const getOccupiedRoomIds = () => {
-    const now = new Date();
     return ongoingSessions.map((s) => s.roomId);
   };
 
