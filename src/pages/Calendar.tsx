@@ -8,13 +8,13 @@ import { useRoomStore } from '@/store/useRoomStore';
 import { useHostStore } from '@/store/useHostStore';
 import { useSessionStore } from '@/store/useSessionStore';
 import type { Session } from '@/types';
-import { format, setHours, setMinutes } from 'date-fns';
 import { CalendarDays, Clock, Users, DollarSign } from 'lucide-react';
 
 export default function Calendar() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSession, setEditingSession] = useState<Session | null>(null);
+  const [presetDate, setPresetDate] = useState<Date | undefined>(undefined);
 
   const scripts = useScriptStore((s) => s.scripts);
   const rooms = useRoomStore((s) => s.rooms);
@@ -41,11 +41,13 @@ export default function Calendar() {
 
   const handleNewSession = (date?: Date) => {
     setEditingSession(null);
+    setPresetDate(date);
     setIsModalOpen(true);
   };
 
   const handleSessionClick = (session: Session) => {
     setEditingSession(session);
+    setPresetDate(undefined);
     setIsModalOpen(true);
   };
 
@@ -57,6 +59,7 @@ export default function Calendar() {
     }
     setIsModalOpen(false);
     setEditingSession(null);
+    setPresetDate(undefined);
   };
 
   return (
@@ -136,6 +139,7 @@ export default function Calendar() {
       >
         <SessionForm
           initialData={editingSession || undefined}
+          presetDate={presetDate}
           scripts={scripts}
           rooms={rooms}
           hosts={hosts}
@@ -143,6 +147,7 @@ export default function Calendar() {
           onCancel={() => {
             setIsModalOpen(false);
             setEditingSession(null);
+            setPresetDate(undefined);
           }}
         />
       </Modal>

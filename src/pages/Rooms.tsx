@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Search } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { RoomCard } from '@/components/management/RoomCard';
 import { Button } from '@/components/ui/Button';

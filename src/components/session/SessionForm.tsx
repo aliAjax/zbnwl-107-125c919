@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
-import { AlertTriangle, Clock, Users, DollarSign } from 'lucide-react';
-import { format, addMinutes } from 'date-fns';
+import { useState, useMemo } from 'react';
+import { AlertTriangle, Clock, Users } from 'lucide-react';
+import { format, addMinutes, setHours, setMinutes } from 'date-fns';
 import type { Session, Script, Room, Host, ConflictResult } from '@/types';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
@@ -9,10 +9,10 @@ import { Badge } from '@/components/ui/Badge';
 import { checkConflicts } from '@/utils/conflictUtils';
 import { formatDurationMinutes } from '@/utils/dateUtils';
 import { useSessionStore } from '@/store/useSessionStore';
-import { cn } from '@/lib/utils';
 
 interface SessionFormProps {
   initialData?: Session;
+  presetDate?: Date;
   scripts: Script[];
   rooms: Room[];
   hosts: Host[];
@@ -20,16 +20,25 @@ interface SessionFormProps {
   onCancel: () => void;
 }
 
-export function SessionForm({ initialData, scripts, rooms, hosts, onSubmit, onCancel }: SessionFormProps) {
+export function SessionForm({ initialData, presetDate, scripts, rooms, hosts, onSubmit, onCancel }: SessionFormProps) {
   const sessions = useSessionStore((s) => s.sessions);
+
+  const getDefaultStartTime = () => {
+    if (initialData?.startTime) {
+      return format(new Date(initialData.startTime), "yyyy-MM-dd'T'HH:mm");
+    }
+    if (presetDate) {
+      const defaultTime = setMinutes(setHours(presetDate, 14), 0);
+      return format(defaultTime, "yyyy-MM-dd'T'HH:mm");
+    }
+    return format(new Date(), "yyyy-MM-dd'T'HH:mm");
+  };
 
   const [formData, setFormData] = useState({
     scriptId: initialData?.scriptId || '',
     roomId: initialData?.roomId || '',
     hostId: initialData?.hostId || '',
-    startTime: initialData?.startTime
-      ? format(new Date(initialData.startTime), "yyyy-MM-dd'T'HH:mm")
-      : format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+    startTime: getDefaultStartTime(),
     playerCount: initialData?.playerCount || 0,
     paidAmount: initialData?.paidAmount || 0,
     paymentStatus: initialData?.paymentStatus || 'unpaid' as const,

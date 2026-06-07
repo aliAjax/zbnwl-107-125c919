@@ -1,9 +1,8 @@
-import { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus } from 'lucide-react';
+import { useMemo } from 'react';
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import {
   startOfWeek,
   endOfWeek,
-  eachDayOfInterval,
   isSameDay,
   isToday,
   addWeeks,
