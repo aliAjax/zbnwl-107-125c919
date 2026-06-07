@@ -4,7 +4,6 @@ import { PageLayout } from '@/components/layout/PageLayout';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
-import { Select } from '@/components/ui/Select';
 import { Badge } from '@/components/ui/Badge';
 import { useMemoStore } from '@/store/useMemoStore';
 import type { Memo, MemoStatus, MemoCategory } from '@/types';
