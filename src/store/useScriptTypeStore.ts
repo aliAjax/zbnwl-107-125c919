@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import type { ScriptType } from '@/types';
+import { mockHosts } from '@/data/mockHosts';
+import { mockScripts } from '@/data/mockScripts';
 import { getFromLocalStorage, setToLocalStorage } from '@/hooks/useLocalStorage';
 
 const defaultScriptTypes: ScriptType[] = [
@@ -18,6 +20,15 @@ const typeGradientColors: Record<string, string> = {
   'type-fun': 'from-emerald-500 to-green-600',
   'type-faction': 'from-purple-500 to-violet-600',
   'type-other': 'from-slate-500 to-slate-600'
+};
+
+const legacyTypeNames: Record<string, string> = Object.fromEntries(
+  defaultScriptTypes.map((type) => [type.id, type.name])
+);
+
+const getTypeAliases = (scriptTypes: ScriptType[], typeId: string) => {
+  const type = scriptTypes.find((t) => t.id === typeId);
+  return new Set([typeId, type?.name, legacyTypeNames[typeId]].filter(Boolean));
 };
 
 interface ScriptTypeUsage {
@@ -40,6 +51,7 @@ interface ScriptTypeState {
   getTypeById: (id: string) => ScriptType | undefined;
   getTypeByName: (name: string) => ScriptType | undefined;
   getTypeUsage: (typeId: string) => ScriptTypeUsage;
+  isTypeValueMatch: (typeId: string, typeValue?: string) => boolean;
 }
 
 const STORAGE_KEY = 'script-killer-script-types';
@@ -90,37 +102,28 @@ export const useScriptTypeStore = create<ScriptTypeState>((set, get) => ({
   },
 
   getTypeUsage: (typeId) => {
-    let scriptCount = 0;
-    let hostCount = 0;
-
     interface StoredScript { type?: string }
     interface StoredHost { specialty?: string[] }
 
-    try {
-      const scripts = getFromLocalStorage<StoredScript[]>('script-killer-scripts', []);
-      const hosts = getFromLocalStorage<StoredHost[]>('script-killer-hosts', []);
+    const scripts = getFromLocalStorage<StoredScript[]>('script-killer-scripts', mockScripts);
+    const hosts = getFromLocalStorage<StoredHost[]>('script-killer-hosts', mockHosts);
+    const matchesType = get().isTypeValueMatch;
 
-      scriptCount = scripts.filter((s) => s.type === typeId).length;
-      hostCount = hosts.filter((h) => h.specialty?.includes(typeId)).length;
-    } catch {
-      const type = get().getTypeById(typeId);
-      if (type) {
-        try {
-          const scripts = getFromLocalStorage<StoredScript[]>('script-killer-scripts', []);
-          const hosts = getFromLocalStorage<StoredHost[]>('script-killer-hosts', []);
-          scriptCount = scripts.filter((s) => s.type === type.name || s.type === typeId).length;
-          hostCount = hosts.filter((h) => h.specialty?.includes(type.name) || h.specialty?.includes(typeId)).length;
-        } catch {
-          // ignore
-        }
-      }
-    }
+    const scriptCount = scripts.filter((s) => matchesType(typeId, s.type)).length;
+    const hostCount = hosts.filter((h) =>
+      h.specialty?.some((specialty) => matchesType(typeId, specialty))
+    ).length;
 
     return {
       scriptCount,
       hostCount,
       inUse: scriptCount > 0 || hostCount > 0
     };
+  },
+
+  isTypeValueMatch: (typeId, typeValue) => {
+    if (!typeValue) return false;
+    return getTypeAliases(get().scriptTypes, typeId).has(typeValue);
   },
 
   toggleActive: (id) => {

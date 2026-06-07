@@ -18,6 +18,7 @@ export default function Scripts() {
 
   const scriptTypes = useScriptTypeStore((s) => s.scriptTypes);
   const getTypeName = useScriptTypeStore((s) => s.getTypeName);
+  const isTypeValueMatch = useScriptTypeStore((s) => s.isTypeValueMatch);
   const activeTypes = useScriptTypeStore((s) => s.getActiveTypes());
   const defaultTypeId = activeTypes.length > 0 ? activeTypes[0].id : 'type-other';
 
@@ -53,7 +54,7 @@ export default function Scripts() {
     const matchesSearch =
       s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       getTypeName(s.type).includes(searchQuery);
-    const matchesType = !typeFilter || s.type === typeFilter;
+    const matchesType = !typeFilter || isTypeValueMatch(typeFilter, s.type);
     return matchesSearch && matchesType;
   });
 

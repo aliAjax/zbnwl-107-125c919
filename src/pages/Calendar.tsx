@@ -26,6 +26,7 @@ export default function Calendar() {
   const addSession = useSessionStore((s) => s.addSession);
   const updateSession = useSessionStore((s) => s.updateSession);
   const scriptTypes = useScriptTypeStore((s) => s.scriptTypes);
+  const isTypeValueMatch = useScriptTypeStore((s) => s.isTypeValueMatch);
 
   const filterTypeOptions = useMemo(() => [
     { value: '', label: '全部类型' },
@@ -36,9 +37,9 @@ export default function Calendar() {
     if (!typeFilter) return sessions;
     return sessions.filter((session) => {
       const script = scripts.find((s) => s.id === session.scriptId);
-      return script?.type === typeFilter;
+      return isTypeValueMatch(typeFilter, script?.type);
     });
-  }, [sessions, typeFilter, scripts]);
+  }, [sessions, typeFilter, scripts, isTypeValueMatch]);
 
   const todaySessions = filteredSessions.filter((s) => {
     const sessionDate = new Date(s.startTime);
