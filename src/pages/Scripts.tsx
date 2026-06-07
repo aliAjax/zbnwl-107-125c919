@@ -7,15 +7,20 @@ import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Select } from '@/components/ui/Select';
 import { useScriptStore } from '@/store/useScriptStore';
+import { useScriptTypeStore } from '@/store/useScriptTypeStore';
 import type { Script } from '@/types';
 
 export default function Scripts() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingScript, setEditingScript] = useState<Script | null>(null);
+
+  const scriptTypes = useScriptTypeStore((s) => s.scriptTypes);
+  const defaultType = scriptTypes[0]?.name || '推理';
+
   const [formData, setFormData] = useState<Partial<Script>>({
     name: '',
-    type: '推理',
+    type: defaultType,
     difficulty: 3,
     duration: 180,
     minPlayers: 4,
@@ -42,7 +47,7 @@ export default function Scripts() {
       setEditingScript(null);
       setFormData({
         name: '',
-        type: '推理',
+        type: defaultType,
         difficulty: 3,
         duration: 180,
         minPlayers: 4,
@@ -130,16 +135,9 @@ export default function Scripts() {
           <div className="grid grid-cols-2 gap-4">
             <Select
               label="剧本类型"
-              value={formData.type || '推理'}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value as Script['type'] })}
-              options={[
-                { value: '恐怖', label: '恐怖' },
-                { value: '情感', label: '情感' },
-                { value: '推理', label: '推理' },
-                { value: '欢乐', label: '欢乐' },
-                { value: '阵营', label: '阵营' },
-                { value: '其他', label: '其他' }
-              ]}
+              value={formData.type || defaultType}
+              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+              options={scriptTypes.map((t) => ({ value: t.name, label: t.name }))}
             />
             <Select
               label="难度等级"

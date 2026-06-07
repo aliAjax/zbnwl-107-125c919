@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { useHostStore } from '@/store/useHostStore';
+import { useScriptTypeStore } from '@/store/useScriptTypeStore';
 import type { Host } from '@/types';
 
-const allSpecialties = ['恐怖', '情感', '推理', '欢乐', '阵营'];
-
 export default function Hosts() {
+  const allSpecialties = useScriptTypeStore((s) => s.getTypeNames());
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingHost, setEditingHost] = useState<Host | null>(null);

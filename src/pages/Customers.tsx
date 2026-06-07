@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { useCustomerStore } from '@/store/useCustomerStore';
+import { useScriptTypeStore } from '@/store/useScriptTypeStore';
 import type { Customer } from '@/types';
 
-const allTypes = ['恐怖', '情感', '推理', '欢乐', '阵营', '其他'];
-
 export default function Customers() {
+  const allTypes = useScriptTypeStore((s) => s.getTypeNames());
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);

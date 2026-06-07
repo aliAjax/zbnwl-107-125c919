@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom';
-import { Calendar, BookOpen, DoorOpen, User, Sparkles, LayoutDashboard, Users } from 'lucide-react';
+import { Calendar, BookOpen, Tag, DoorOpen, User, Sparkles, LayoutDashboard, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { path: '/', label: '排期日历', icon: Calendar },
   { path: '/dashboard', label: '运营看板', icon: LayoutDashboard },
   { path: '/scripts', label: '剧本管理', icon: BookOpen },
+  { path: '/script-types', label: '剧本类型', icon: Tag },
   { path: '/rooms', label: '房间管理', icon: DoorOpen },
   { path: '/hosts', label: '主持人', icon: User },
   { path: '/customers', label: '客户管理', icon: Users }

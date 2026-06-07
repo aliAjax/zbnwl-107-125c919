@@ -3,6 +3,7 @@ import type { Script } from '@/types';
 import { formatDurationMinutes } from '@/utils/dateUtils';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { useScriptTypeStore } from '@/store/useScriptTypeStore';
 
 interface ScriptCardProps {
   script: Script;
@@ -10,16 +11,10 @@ interface ScriptCardProps {
   onDelete: () => void;
 }
 
-const typeColors: Record<string, 'success' | 'warning' | 'danger' | 'info' | 'gold' | 'default'> = {
-  '恐怖': 'danger',
-  '情感': 'gold',
-  '推理': 'info',
-  '欢乐': 'success',
-  '阵营': 'warning',
-  '其他': 'default'
-};
-
 export function ScriptCard({ script, onEdit, onDelete }: ScriptCardProps) {
+  const getScriptTypeByName = useScriptTypeStore((s) => s.getScriptTypeByName);
+  const scriptType = getScriptTypeByName(script.type);
+  const badgeVariant = scriptType?.badgeVariant || 'default';
   return (
     <div className="group bg-slate-800/50 rounded-xl border border-slate-700/50 overflow-hidden hover:border-indigo-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/10">
       <div className="aspect-video relative overflow-hidden">
@@ -35,7 +30,7 @@ export function ScriptCard({ script, onEdit, onDelete }: ScriptCardProps) {
           </div>
         )}
         <div className="absolute top-3 left-3">
-          <Badge variant={typeColors[script.type] || 'default'}>
+          <Badge variant={badgeVariant}>
             {script.type}
           </Badge>
         </div>
