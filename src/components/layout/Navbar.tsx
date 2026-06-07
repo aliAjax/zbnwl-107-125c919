@@ -1,9 +1,10 @@
 import { NavLink } from 'react-router-dom';
-import { Calendar, BookOpen, DoorOpen, User, Sparkles } from 'lucide-react';
+import { Calendar, BookOpen, DoorOpen, User, Sparkles, LayoutDashboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { path: '/', label: '排期日历', icon: Calendar },
+  { path: '/dashboard', label: '运营看板', icon: LayoutDashboard },
   { path: '/scripts', label: '剧本管理', icon: BookOpen },
   { path: '/rooms', label: '房间管理', icon: DoorOpen },
   { path: '/hosts', label: '主持人', icon: User }
