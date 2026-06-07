@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { ScriptTag } from '@/types';
 import { getFromLocalStorage, setToLocalStorage } from '@/hooks/useLocalStorage';
+import { useScriptStore } from './useScriptStore';
 
 interface ScriptTagState {
   scriptTags: ScriptTag[];
@@ -60,18 +61,26 @@ export const useScriptTagStore = create<ScriptTagState>((set, get) => ({
 
   updateScriptTag: (id, tag) => {
     set((state) => {
+      const oldTag = state.scriptTags.find((t) => t.id === id);
       const scriptTags = state.scriptTags.map((t) =>
         t.id === id ? { ...t, ...tag } : t
       );
       setToLocalStorage(STORAGE_KEY, scriptTags);
+      if (oldTag && tag.name && oldTag.name !== tag.name) {
+        useScriptStore.getState().updateTagNameInScripts(oldTag.name, tag.name);
+      }
       return { scriptTags };
     });
   },
 
   deleteScriptTag: (id) => {
     set((state) => {
+      const deletedTag = state.scriptTags.find((t) => t.id === id);
       const scriptTags = state.scriptTags.filter((t) => t.id !== id);
       setToLocalStorage(STORAGE_KEY, scriptTags);
+      if (deletedTag) {
+        useScriptStore.getState().removeTagFromScripts(deletedTag.name);
+      }
       return { scriptTags };
     });
   },

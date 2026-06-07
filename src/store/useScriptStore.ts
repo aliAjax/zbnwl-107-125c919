@@ -9,6 +9,8 @@ interface ScriptState {
   updateScript: (id: string, script: Partial<Script>) => void;
   deleteScript: (id: string) => void;
   getScriptById: (id: string) => Script | undefined;
+  updateTagNameInScripts: (oldName: string, newName: string) => void;
+  removeTagFromScripts: (tagName: string) => void;
 }
 
 const STORAGE_KEY = 'script-killer-scripts';
@@ -50,5 +52,27 @@ export const useScriptStore = create<ScriptState>((set, get) => ({
 
   getScriptById: (id) => {
     return get().scripts.find((s) => s.id === id);
+  },
+
+  updateTagNameInScripts: (oldName, newName) => {
+    set((state) => {
+      const scripts = state.scripts.map((s) => ({
+        ...s,
+        tags: (s.tags || []).map((t) => (t === oldName ? newName : t))
+      }));
+      setToLocalStorage(STORAGE_KEY, scripts);
+      return { scripts };
+    });
+  },
+
+  removeTagFromScripts: (tagName) => {
+    set((state) => {
+      const scripts = state.scripts.map((s) => ({
+        ...s,
+        tags: (s.tags || []).filter((t) => t !== tagName)
+      }));
+      setToLocalStorage(STORAGE_KEY, scripts);
+      return { scripts };
+    });
   }
 }));
