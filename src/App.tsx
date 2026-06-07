@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Calendar from "@/pages/Calendar";
 import Scripts from "@/pages/Scripts";
 import ScriptTypes from "@/pages/ScriptTypes";
+import ScriptTags from "@/pages/ScriptTags";
 import Rooms from "@/pages/Rooms";
 import Hosts from "@/pages/Hosts";
 import Customers from "@/pages/Customers";
@@ -16,6 +17,7 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/scripts" element={<Scripts />} />
         <Route path="/script-types" element={<ScriptTypes />} />
+        <Route path="/script-tags" element={<ScriptTags />} />
         <Route path="/rooms" element={<Rooms />} />
         <Route path="/hosts" element={<Hosts />} />
         <Route path="/customers" element={<Customers />} />

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, X } from 'lucide-react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { ScriptCard } from '@/components/management/ScriptCard';
 import { Button } from '@/components/ui/Button';
@@ -8,6 +8,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Select } from '@/components/ui/Select';
 import { useScriptStore } from '@/store/useScriptStore';
 import { useScriptTypeStore } from '@/store/useScriptTypeStore';
+import { useScriptTagStore } from '@/store/useScriptTagStore';
 import type { Script } from '@/types';
 
 export default function Scripts() {
@@ -17,6 +18,7 @@ export default function Scripts() {
   const [editingScript, setEditingScript] = useState<Script | null>(null);
 
   const scriptTypes = useScriptTypeStore((s) => s.scriptTypes);
+  const scriptTags = useScriptTagStore((s) => s.scriptTags);
   const defaultType = scriptTypes[0]?.name || '推理';
 
   const [formData, setFormData] = useState<Partial<Script>>({
@@ -26,7 +28,8 @@ export default function Scripts() {
     duration: 180,
     minPlayers: 4,
     maxPlayers: 6,
-    description: ''
+    description: '',
+    tags: []
   });
 
   const scripts = useScriptStore((s) => s.scripts);
@@ -55,7 +58,7 @@ export default function Scripts() {
   const handleOpenModal = (script?: Script) => {
     if (script) {
       setEditingScript(script);
-      setFormData(script);
+      setFormData({ ...script, tags: script.tags || [] });
     } else {
       setEditingScript(null);
       setFormData({
@@ -65,10 +68,19 @@ export default function Scripts() {
         duration: 180,
         minPlayers: 4,
         maxPlayers: 6,
-        description: ''
+        description: '',
+        tags: []
       });
     }
     setIsModalOpen(true);
+  };
+
+  const toggleTag = (tagName: string) => {
+    const currentTags = formData.tags || [];
+    const newTags = currentTags.includes(tagName)
+      ? currentTags.filter((t) => t !== tagName)
+      : [...currentTags, tagName];
+    setFormData({ ...formData, tags: newTags });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -170,6 +182,34 @@ export default function Scripts() {
                 { value: '5', label: '⭐⭐⭐⭐⭐ 烧脑' }
               ]}
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">剧本标签</label>
+            <div className="flex flex-wrap gap-2">
+              {scriptTags.length > 0 ? (
+                scriptTags.map((tag) => {
+                  const isSelected = (formData.tags || []).includes(tag.name);
+                  return (
+                    <button
+                      key={tag.id}
+                      type="button"
+                      onClick={() => toggleTag(tag.name)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                        isSelected
+                          ? 'text-white ring-2 ring-offset-2 ring-offset-slate-800'
+                          : 'text-slate-300 bg-slate-800 hover:bg-slate-700'
+                      }`}
+                      style={isSelected ? { backgroundColor: tag.color } : {}}
+                    >
+                      {tag.name}
+                      {isSelected && <X size={14} />}
+                    </button>
+                  );
+                })
+              ) : (
+                <p className="text-sm text-slate-500">暂无标签，请先在"剧本标签"页面添加</p>
+              )}
+            </div>
           </div>
           <div className="grid grid-cols-3 gap-4">
             <Input

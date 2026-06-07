@@ -4,6 +4,7 @@ import { formatDurationMinutes } from '@/utils/dateUtils';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useScriptTypeStore } from '@/store/useScriptTypeStore';
+import { useScriptTagStore } from '@/store/useScriptTagStore';
 
 interface ScriptCardProps {
   script: Script;
@@ -13,8 +14,10 @@ interface ScriptCardProps {
 
 export function ScriptCard({ script, onEdit, onDelete }: ScriptCardProps) {
   const getScriptTypeByName = useScriptTypeStore((s) => s.getScriptTypeByName);
+  const getTagByName = useScriptTagStore((s) => s.getTagByName);
   const scriptType = getScriptTypeByName(script.type);
   const badgeVariant = scriptType?.badgeVariant || 'default';
+  const scriptTags = script.tags || [];
   return (
     <div className="group bg-slate-800/50 rounded-xl border border-slate-700/50 overflow-hidden hover:border-indigo-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/10">
       <div className="aspect-video relative overflow-hidden">
@@ -29,7 +32,7 @@ export function ScriptCard({ script, onEdit, onDelete }: ScriptCardProps) {
             <span className="text-4xl text-slate-600">🎭</span>
           </div>
         )}
-        <div className="absolute top-3 left-3">
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
           <Badge variant={badgeVariant}>
             {script.type}
           </Badge>
@@ -76,6 +79,22 @@ export function ScriptCard({ script, onEdit, onDelete }: ScriptCardProps) {
             ))}
           </div>
         </div>
+        {scriptTags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {scriptTags.map((tagName) => {
+              const tag = getTagByName(tagName);
+              return (
+                <span
+                  key={tagName}
+                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium text-white"
+                  style={{ backgroundColor: tag?.color || '#64748b' }}
+                >
+                  {tagName}
+                </span>
+              );
+            })}
+          </div>
+        )}
         <p className="text-sm text-slate-400 line-clamp-2">
           {script.description}
         </p>

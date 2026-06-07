@@ -12,6 +12,13 @@ export interface ScriptType {
   badgeVariant: BadgeVariant;
 }
 
+export interface ScriptTag {
+  id: string;
+  name: string;
+  color: string;
+  description?: string;
+}
+
 export interface Script {
   id: string;
   name: string;
@@ -22,6 +29,7 @@ export interface Script {
   maxPlayers: number;
   description: string;
   coverImage?: string;
+  tags: string[];
 }
 
 export interface Room {
