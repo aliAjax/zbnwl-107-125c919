@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { useHostStore } from '@/store/useHostStore';
-import { useScriptTypeStore } from '@/store/useScriptTypeStore';
 import type { Host } from '@/types';
+
+const allSpecialties = ['恐怖', '情感', '推理', '欢乐', '阵营'];
 
 export default function Hosts() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -18,8 +19,6 @@ export default function Hosts() {
     phone: '',
     specialty: []
   });
-
-  const activeTypes = useScriptTypeStore((s) => s.getActiveTypes());
 
   const hosts = useHostStore((s) => s.hosts);
   const addHost = useHostStore((s) => s.addHost);
@@ -137,22 +136,22 @@ export default function Hosts() {
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">擅长类型</label>
             <div className="flex flex-wrap gap-2">
-              {activeTypes.map((type) => (
+              {allSpecialties.map((specialty) => (
                 <label
-                  key={type.id}
+                  key={specialty}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-full border cursor-pointer transition-colors text-sm ${
-                    (formData.specialty || []).includes(type.id)
+                    (formData.specialty || []).includes(specialty)
                       ? 'bg-indigo-500/20 border-indigo-500/50 text-indigo-300'
                       : 'bg-slate-900/50 border-slate-600 text-slate-300 hover:border-slate-500'
                   }`}
                 >
                   <input
                     type="checkbox"
-                    checked={(formData.specialty || []).includes(type.id)}
-                    onChange={() => handleSpecialtyToggle(type.id)}
+                    checked={(formData.specialty || []).includes(specialty)}
+                    onChange={() => handleSpecialtyToggle(specialty)}
                     className="sr-only"
                   />
-                  <span>{type.name}</span>
+                  <span>{specialty}</span>
                 </label>
               ))}
             </div>

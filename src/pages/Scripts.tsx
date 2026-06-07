@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Plus, Search } from 'lucide-react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { ScriptCard } from '@/components/management/ScriptCard';
@@ -7,24 +7,15 @@ import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Select } from '@/components/ui/Select';
 import { useScriptStore } from '@/store/useScriptStore';
-import { useScriptTypeStore } from '@/store/useScriptTypeStore';
 import type { Script } from '@/types';
 
 export default function Scripts() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingScript, setEditingScript] = useState<Script | null>(null);
-
-  const scriptTypes = useScriptTypeStore((s) => s.scriptTypes);
-  const getTypeName = useScriptTypeStore((s) => s.getTypeName);
-  const isTypeValueMatch = useScriptTypeStore((s) => s.isTypeValueMatch);
-  const activeTypes = useScriptTypeStore((s) => s.getActiveTypes());
-  const defaultTypeId = activeTypes.length > 0 ? activeTypes[0].id : 'type-other';
-
   const [formData, setFormData] = useState<Partial<Script>>({
     name: '',
-    type: defaultTypeId,
+    type: '推理',
     difficulty: 3,
     duration: 180,
     minPlayers: 4,
@@ -37,26 +28,11 @@ export default function Scripts() {
   const updateScript = useScriptStore((s) => s.updateScript);
   const deleteScript = useScriptStore((s) => s.deleteScript);
 
-  const typeOptions = useMemo(() =>
-    activeTypes.map((t) => ({
-      value: t.id,
-      label: t.name
-    })),
-    [activeTypes]
-  );
-
-  const filterTypeOptions = useMemo(() => [
-    { value: '', label: '全部类型' },
-    ...scriptTypes.map((t) => ({ value: t.id, label: t.name }))
-  ], [scriptTypes]);
-
-  const filteredScripts = scripts.filter((s) => {
-    const matchesSearch =
+  const filteredScripts = scripts.filter(
+    (s) =>
       s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      getTypeName(s.type).includes(searchQuery);
-    const matchesType = !typeFilter || isTypeValueMatch(typeFilter, s.type);
-    return matchesSearch && matchesType;
-  });
+      s.type.includes(searchQuery)
+  );
 
   const handleOpenModal = (script?: Script) => {
     if (script) {
@@ -66,7 +42,7 @@ export default function Scripts() {
       setEditingScript(null);
       setFormData({
         name: '',
-        type: defaultTypeId,
+        type: '推理',
         difficulty: 3,
         duration: 180,
         minPlayers: 4,
@@ -107,8 +83,8 @@ export default function Scripts() {
           </Button>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 max-w-2xl">
-          <div className="relative flex-1">
+        <div className="max-w-md">
+          <div className="relative">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <Input
               placeholder="搜索剧本名称或类型..."
@@ -117,12 +93,6 @@ export default function Scripts() {
               className="pl-10"
             />
           </div>
-          <Select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            options={filterTypeOptions}
-            className="sm:w-48"
-          />
         </div>
 
         {filteredScripts.length > 0 ? (
@@ -160,9 +130,16 @@ export default function Scripts() {
           <div className="grid grid-cols-2 gap-4">
             <Select
               label="剧本类型"
-              value={formData.type || defaultTypeId}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-              options={typeOptions}
+              value={formData.type || '推理'}
+              onChange={(e) => setFormData({ ...formData, type: e.target.value as Script['type'] })}
+              options={[
+                { value: '恐怖', label: '恐怖' },
+                { value: '情感', label: '情感' },
+                { value: '推理', label: '推理' },
+                { value: '欢乐', label: '欢乐' },
+                { value: '阵营', label: '阵营' },
+                { value: '其他', label: '其他' }
+              ]}
             />
             <Select
               label="难度等级"

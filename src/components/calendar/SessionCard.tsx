@@ -4,7 +4,6 @@ import { formatTime } from '@/utils/dateUtils';
 import { Badge } from '@/components/ui/Badge';
 import { CountdownTimer } from '@/components/session/CountdownTimer';
 import { cn } from '@/lib/utils';
-import { useScriptTypeStore } from '@/store/useScriptTypeStore';
 
 interface SessionCardProps {
   session: Session;
@@ -20,10 +19,19 @@ const paymentStatusConfig: Record<string, { label: string; variant: 'success' | 
   unpaid: { label: '未付款', variant: 'danger' }
 };
 
+const typeColors: Record<string, string> = {
+  '恐怖': 'from-rose-600 to-red-700',
+  '情感': 'from-amber-500 to-orange-600',
+  '推理': 'from-blue-500 to-indigo-600',
+  '欢乐': 'from-emerald-500 to-green-600',
+  '阵营': 'from-purple-500 to-violet-600',
+  '其他': 'from-slate-500 to-slate-600'
+};
+
 export function SessionCard({ session, script, room, host, onClick }: SessionCardProps) {
-  const getTypeGradient = useScriptTypeStore((s) => s.getTypeGradient);
   const payment = paymentStatusConfig[session.paymentStatus];
-  const gradientClass = getTypeGradient(script?.type || '');
+  const scriptType = script?.type || '其他';
+  const gradientClass = typeColors[scriptType] || typeColors['其他'];
 
   if (session.status === 'cancelled') {
     return (

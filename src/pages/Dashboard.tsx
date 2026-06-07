@@ -4,7 +4,6 @@ import { useSessionStore } from '@/store/useSessionStore';
 import { useRoomStore } from '@/store/useRoomStore';
 import { useScriptStore } from '@/store/useScriptStore';
 import { useHostStore } from '@/store/useHostStore';
-import { useScriptTypeStore } from '@/store/useScriptTypeStore';
 import { formatTime, formatDate, isToday } from '@/utils/dateUtils';
 import {
   LayoutDashboard,
@@ -35,12 +34,20 @@ const sessionStatusConfig: Record<string, { label: string; variant: 'success' | 
   cancelled: { label: '已取消', variant: 'default' }
 };
 
+const typeColors: Record<string, string> = {
+  '恐怖': 'from-rose-600 to-red-700',
+  '情感': 'from-amber-500 to-orange-600',
+  '推理': 'from-blue-500 to-indigo-600',
+  '欢乐': 'from-emerald-500 to-green-600',
+  '阵营': 'from-purple-500 to-violet-600',
+  '其他': 'from-slate-500 to-slate-600'
+};
+
 export default function Dashboard() {
   const sessions = useSessionStore((s) => s.sessions);
   const rooms = useRoomStore((s) => s.rooms);
   const scripts = useScriptStore((s) => s.scripts);
   const hosts = useHostStore((s) => s.hosts);
-  const getTypeGradient = useScriptTypeStore((s) => s.getTypeGradient);
 
   const todaySessions = sessions.filter((s) => isToday(new Date(s.startTime)));
   const sortedTodaySessions = [...todaySessions].sort(
@@ -156,7 +163,8 @@ export default function Dashboard() {
                     const host = getHostById(session.hostId);
                     const payment = paymentStatusConfig[session.paymentStatus];
                     const status = sessionStatusConfig[session.status];
-                    const gradientClass = getTypeGradient(script?.type || '');
+                    const scriptType = script?.type || '其他';
+                    const gradientClass = typeColors[scriptType] || typeColors['其他'];
 
                     return (
                       <div

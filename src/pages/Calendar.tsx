@@ -1,14 +1,12 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { CalendarView } from '@/components/calendar/CalendarView';
 import { Modal } from '@/components/ui/Modal';
 import { SessionForm } from '@/components/session/SessionForm';
-import { Select } from '@/components/ui/Select';
 import { useScriptStore } from '@/store/useScriptStore';
 import { useRoomStore } from '@/store/useRoomStore';
 import { useHostStore } from '@/store/useHostStore';
 import { useSessionStore } from '@/store/useSessionStore';
-import { useScriptTypeStore } from '@/store/useScriptTypeStore';
 import type { Session } from '@/types';
 import { CalendarDays, Clock, Users, DollarSign } from 'lucide-react';
 
@@ -17,7 +15,6 @@ export default function Calendar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSession, setEditingSession] = useState<Session | null>(null);
   const [presetDate, setPresetDate] = useState<Date | undefined>(undefined);
-  const [typeFilter, setTypeFilter] = useState('');
 
   const scripts = useScriptStore((s) => s.scripts);
   const rooms = useRoomStore((s) => s.rooms);
@@ -25,23 +22,8 @@ export default function Calendar() {
   const sessions = useSessionStore((s) => s.sessions);
   const addSession = useSessionStore((s) => s.addSession);
   const updateSession = useSessionStore((s) => s.updateSession);
-  const scriptTypes = useScriptTypeStore((s) => s.scriptTypes);
-  const isTypeValueMatch = useScriptTypeStore((s) => s.isTypeValueMatch);
 
-  const filterTypeOptions = useMemo(() => [
-    { value: '', label: '全部类型' },
-    ...scriptTypes.map((t) => ({ value: t.id, label: t.name }))
-  ], [scriptTypes]);
-
-  const filteredSessions = useMemo(() => {
-    if (!typeFilter) return sessions;
-    return sessions.filter((session) => {
-      const script = scripts.find((s) => s.id === session.scriptId);
-      return isTypeValueMatch(typeFilter, script?.type);
-    });
-  }, [sessions, typeFilter, scripts, isTypeValueMatch]);
-
-  const todaySessions = filteredSessions.filter((s) => {
+  const todaySessions = sessions.filter((s) => {
     const sessionDate = new Date(s.startTime);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -83,17 +65,9 @@ export default function Calendar() {
   return (
     <PageLayout>
       <div className="space-y-6 animate-fade-in">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-white font-display mb-1">排期日历</h1>
-            <p className="text-slate-400">管理和查看所有场次安排</p>
-          </div>
-          <Select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            options={filterTypeOptions}
-            className="sm:w-48"
-          />
+        <div>
+          <h1 className="text-2xl font-bold text-white font-display mb-1">排期日历</h1>
+          <p className="text-slate-400">管理和查看所有场次安排</p>
         </div>
 
         <div className="grid grid-cols-4 gap-4">
@@ -144,7 +118,7 @@ export default function Calendar() {
         </div>
 
         <CalendarView
-          sessions={filteredSessions}
+          sessions={sessions}
           scripts={scripts}
           rooms={rooms}
           hosts={hosts}

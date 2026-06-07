@@ -3,8 +3,8 @@ import Calendar from "@/pages/Calendar";
 import Scripts from "@/pages/Scripts";
 import Rooms from "@/pages/Rooms";
 import Hosts from "@/pages/Hosts";
+import Customers from "@/pages/Customers";
 import Dashboard from "@/pages/Dashboard";
-import ScriptTypes from "@/pages/ScriptTypes";
 
 export default function App() {
   return (
@@ -15,7 +15,7 @@ export default function App() {
         <Route path="/scripts" element={<Scripts />} />
         <Route path="/rooms" element={<Rooms />} />
         <Route path="/hosts" element={<Hosts />} />
-        <Route path="/script-types" element={<ScriptTypes />} />
+        <Route path="/customers" element={<Customers />} />
       </Routes>
     </Router>
   );

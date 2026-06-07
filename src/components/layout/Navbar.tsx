@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Calendar, BookOpen, DoorOpen, User, Sparkles, LayoutDashboard, Tags } from 'lucide-react';
+import { Calendar, BookOpen, DoorOpen, User, Sparkles, LayoutDashboard, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -8,7 +8,7 @@ const navItems = [
   { path: '/scripts', label: '剧本管理', icon: BookOpen },
   { path: '/rooms', label: '房间管理', icon: DoorOpen },
   { path: '/hosts', label: '主持人', icon: User },
-  { path: '/script-types', label: '调式管理', icon: Tags }
+  { path: '/customers', label: '客户管理', icon: Users }
 ];
 
 export function Navbar() {
