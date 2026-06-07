@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { HostCard } from '@/components/management/HostCard';
@@ -20,12 +20,6 @@ export default function Hosts() {
   });
 
   const activeTypes = useScriptTypeStore((s) => s.getActiveTypes());
-  const getTypeName = useScriptTypeStore((s) => s.getTypeName);
-
-  const allSpecialties = useMemo(() =>
-    activeTypes.map((t) => t.id),
-    [activeTypes]
-  );
 
   const hosts = useHostStore((s) => s.hosts);
   const addHost = useHostStore((s) => s.addHost);

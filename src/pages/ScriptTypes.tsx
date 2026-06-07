@@ -30,6 +30,7 @@ export default function ScriptTypes() {
   const deleteScriptType = useScriptTypeStore((s) => s.deleteScriptType);
   const toggleActive = useScriptTypeStore((s) => s.toggleActive);
   const reorder = useScriptTypeStore((s) => s.reorder);
+  const getTypeUsage = useScriptTypeStore((s) => s.getTypeUsage);
 
   const sortedTypes = [...scriptTypes].sort((a, b) => a.sortOrder - b.sortOrder);
 
@@ -55,8 +56,16 @@ export default function ScriptTypes() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('确定要删除这个类型吗？已有记录中的历史类型不会丢失展示。')) {
-      deleteScriptType(id);
+    const usage = getTypeUsage(id);
+    if (usage.inUse) {
+      alert(`该类型正在被使用中（${usage.scriptCount} 个剧本，${usage.hostCount} 个主持人），无法删除。如需删除，请先移除相关引用。`);
+      return;
+    }
+    if (confirm('确定要删除这个类型吗？')) {
+      const success = deleteScriptType(id);
+      if (!success) {
+        alert('删除失败，该类型可能正在被使用。');
+      }
     }
   };
 
@@ -81,82 +90,96 @@ export default function ScriptTypes() {
                 <p className="text-slate-500">暂无类型，点击上方按钮添加第一个类型</p>
               </div>
             ) : (
-              sortedTypes.map((type, index) => (
-                <div
-                  key={type.id}
-                  className={cn(
-                    'px-6 py-4 flex items-center justify-between',
-                    'hover:bg-slate-700/30 transition-colors',
-                    !type.active && 'opacity-50'
-                  )}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="flex flex-col gap-1">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="w-8 h-8 p-0"
-                        onClick={() => reorder(type.id, 'up')}
-                        disabled={index === 0}
-                      >
-                        <ChevronUp size={16} />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="w-8 h-8 p-0"
-                        onClick={() => reorder(type.id, 'down')}
-                        disabled={index === sortedTypes.length - 1}
-                      >
-                        <ChevronDown size={16} />
-                      </Button>
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-white">{type.name}</h3>
-                        {!type.active && (
-                          <Badge variant="default" className="text-xs">
-                            已停用
-                          </Badge>
-                        )}
+              sortedTypes.map((type, index) => {
+                const usage = getTypeUsage(type.id);
+                return (
+                  <div
+                    key={type.id}
+                    className={cn(
+                      'px-6 py-4 flex items-center justify-between',
+                      'hover:bg-slate-700/30 transition-colors',
+                      !type.active && 'opacity-50'
+                    )}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="flex flex-col gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="w-8 h-8 p-0"
+                          onClick={() => reorder(type.id, 'up')}
+                          disabled={index === 0}
+                        >
+                          <ChevronUp size={16} />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="w-8 h-8 p-0"
+                          onClick={() => reorder(type.id, 'down')}
+                          disabled={index === sortedTypes.length - 1}
+                        >
+                          <ChevronDown size={16} />
+                        </Button>
                       </div>
-                      <p className="text-xs text-slate-500">ID: {type.id}</p>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-white">{type.name}</h3>
+                          {!type.active && (
+                            <Badge variant="default" className="text-xs">
+                              已停用
+                            </Badge>
+                          )}
+                          {usage.inUse && (
+                            <Badge variant="info" className="text-xs">
+                              使用中: {usage.scriptCount}剧本/{usage.hostCount}主持
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-slate-500">ID: {type.id}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant={type.color as any || 'default'}>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={type.color as 'success' | 'warning' | 'danger' | 'info' | 'gold' | 'default' || 'default'}>
                       {type.name}
                     </Badge>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="w-9 h-9 p-0"
-                      onClick={() => toggleActive(type.id)}
-                      title={type.active ? '停用' : '启用'}
-                    >
-                      <Power size={16} className={type.active ? 'text-emerald-400' : 'text-slate-500'} />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="w-9 h-9 p-0"
-                      onClick={() => handleOpenModal(type)}
-                      title="编辑"
-                    >
-                      <Edit2 size={16} />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="w-9 h-9 p-0 text-rose-400 hover:text-rose-300"
-                      onClick={() => handleDelete(type.id)}
-                      title="删除"
-                    >
-                      <Trash2 size={16} />
-                    </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="w-9 h-9 p-0"
+                        onClick={() => toggleActive(type.id)}
+                        title={type.active ? '停用' : '启用'}
+                      >
+                        <Power size={16} className={type.active ? 'text-emerald-400' : 'text-slate-500'} />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="w-9 h-9 p-0"
+                        onClick={() => handleOpenModal(type)}
+                        title="编辑"
+                      >
+                        <Edit2 size={16} />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className={cn(
+                          'w-9 h-9 p-0',
+                          usage.inUse
+                            ? 'text-slate-600 cursor-not-allowed'
+                            : 'text-rose-400 hover:text-rose-300'
+                        )}
+                        onClick={() => handleDelete(type.id)}
+                        title={usage.inUse ? '使用中，无法删除' : '删除'}
+                        disabled={usage.inUse}
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>

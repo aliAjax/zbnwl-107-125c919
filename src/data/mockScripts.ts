@@ -4,7 +4,7 @@ export const mockScripts: Script[] = [
   {
     id: 'script-1',
     name: '雾都迷案',
-    type: '推理',
+    type: 'type-mystery',
     difficulty: 4,
     duration: 240,
     minPlayers: 5,
@@ -15,7 +15,7 @@ export const mockScripts: Script[] = [
   {
     id: 'script-2',
     name: '夜半钟声',
-    type: '恐怖',
+    type: 'type-horror',
     difficulty: 3,
     duration: 180,
     minPlayers: 4,
@@ -26,7 +26,7 @@ export const mockScripts: Script[] = [
   {
     id: 'script-3',
     name: '时光情书',
-    type: '情感',
+    type: 'type-emotion',
     difficulty: 2,
     duration: 210,
     minPlayers: 6,
@@ -37,7 +37,7 @@ export const mockScripts: Script[] = [
   {
     id: 'script-4',
     name: '欢乐派对',
-    type: '欢乐',
+    type: 'type-fun',
     difficulty: 1,
     duration: 150,
     minPlayers: 6,
@@ -48,7 +48,7 @@ export const mockScripts: Script[] = [
   {
     id: 'script-5',
     name: '三国风云',
-    type: '阵营',
+    type: 'type-faction',
     difficulty: 5,
     duration: 300,
     minPlayers: 8,
@@ -59,7 +59,7 @@ export const mockScripts: Script[] = [
   {
     id: 'script-6',
     name: '深海遗踪',
-    type: '推理',
+    type: 'type-mystery',
     difficulty: 4,
     duration: 240,
     minPlayers: 5,

@@ -20,11 +20,17 @@ const typeGradientColors: Record<string, string> = {
   'type-other': 'from-slate-500 to-slate-600'
 };
 
+interface ScriptTypeUsage {
+  scriptCount: number;
+  hostCount: number;
+  inUse: boolean;
+}
+
 interface ScriptTypeState {
   scriptTypes: ScriptType[];
   addScriptType: (name: string, color?: string) => void;
   updateScriptType: (id: string, updates: Partial<ScriptType>) => void;
-  deleteScriptType: (id: string) => void;
+  deleteScriptType: (id: string) => boolean;
   toggleActive: (id: string) => void;
   reorder: (id: string, direction: 'up' | 'down') => void;
   getTypeName: (typeIdOrName: string) => string;
@@ -33,6 +39,7 @@ interface ScriptTypeState {
   getActiveTypes: () => ScriptType[];
   getTypeById: (id: string) => ScriptType | undefined;
   getTypeByName: (name: string) => ScriptType | undefined;
+  getTypeUsage: (typeId: string) => ScriptTypeUsage;
 }
 
 const STORAGE_KEY = 'script-killer-script-types';
@@ -69,11 +76,51 @@ export const useScriptTypeStore = create<ScriptTypeState>((set, get) => ({
   },
 
   deleteScriptType: (id) => {
+    const state = get();
+    const usage = state.getTypeUsage(id);
+    if (usage.inUse) {
+      return false;
+    }
     set((state) => {
       const scriptTypes = state.scriptTypes.filter((t) => t.id !== id);
       setToLocalStorage(STORAGE_KEY, scriptTypes);
       return { scriptTypes };
     });
+    return true;
+  },
+
+  getTypeUsage: (typeId) => {
+    let scriptCount = 0;
+    let hostCount = 0;
+
+    interface StoredScript { type?: string }
+    interface StoredHost { specialty?: string[] }
+
+    try {
+      const scripts = getFromLocalStorage<StoredScript[]>('script-killer-scripts', []);
+      const hosts = getFromLocalStorage<StoredHost[]>('script-killer-hosts', []);
+
+      scriptCount = scripts.filter((s) => s.type === typeId).length;
+      hostCount = hosts.filter((h) => h.specialty?.includes(typeId)).length;
+    } catch {
+      const type = get().getTypeById(typeId);
+      if (type) {
+        try {
+          const scripts = getFromLocalStorage<StoredScript[]>('script-killer-scripts', []);
+          const hosts = getFromLocalStorage<StoredHost[]>('script-killer-hosts', []);
+          scriptCount = scripts.filter((s) => s.type === type.name || s.type === typeId).length;
+          hostCount = hosts.filter((h) => h.specialty?.includes(type.name) || h.specialty?.includes(typeId)).length;
+        } catch {
+          // ignore
+        }
+      }
+    }
+
+    return {
+      scriptCount,
+      hostCount,
+      inUse: scriptCount > 0 || hostCount > 0
+    };
   },
 
   toggleActive: (id) => {

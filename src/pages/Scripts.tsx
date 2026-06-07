@@ -12,11 +12,13 @@ import type { Script } from '@/types';
 
 export default function Scripts() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingScript, setEditingScript] = useState<Script | null>(null);
 
-  const activeTypes = useScriptTypeStore((s) => s.getActiveTypes());
+  const scriptTypes = useScriptTypeStore((s) => s.scriptTypes);
   const getTypeName = useScriptTypeStore((s) => s.getTypeName);
+  const activeTypes = useScriptTypeStore((s) => s.getActiveTypes());
   const defaultTypeId = activeTypes.length > 0 ? activeTypes[0].id : 'type-other';
 
   const [formData, setFormData] = useState<Partial<Script>>({
@@ -42,11 +44,18 @@ export default function Scripts() {
     [activeTypes]
   );
 
-  const filteredScripts = scripts.filter(
-    (s) =>
+  const filterTypeOptions = useMemo(() => [
+    { value: '', label: '全部类型' },
+    ...scriptTypes.map((t) => ({ value: t.id, label: t.name }))
+  ], [scriptTypes]);
+
+  const filteredScripts = scripts.filter((s) => {
+    const matchesSearch =
       s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      getTypeName(s.type).includes(searchQuery)
-  );
+      getTypeName(s.type).includes(searchQuery);
+    const matchesType = !typeFilter || s.type === typeFilter;
+    return matchesSearch && matchesType;
+  });
 
   const handleOpenModal = (script?: Script) => {
     if (script) {
@@ -97,8 +106,8 @@ export default function Scripts() {
           </Button>
         </div>
 
-        <div className="max-w-md">
-          <div className="relative">
+        <div className="flex flex-col sm:flex-row gap-4 max-w-2xl">
+          <div className="relative flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <Input
               placeholder="搜索剧本名称或类型..."
@@ -107,6 +116,12 @@ export default function Scripts() {
               className="pl-10"
             />
           </div>
+          <Select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            options={filterTypeOptions}
+            className="sm:w-48"
+          />
         </div>
 
         {filteredScripts.length > 0 ? (

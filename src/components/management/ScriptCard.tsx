@@ -15,7 +15,7 @@ export function ScriptCard({ script, onEdit, onDelete }: ScriptCardProps) {
   const getTypeName = useScriptTypeStore((s) => s.getTypeName);
   const getTypeColor = useScriptTypeStore((s) => s.getTypeColor);
   const typeName = getTypeName(script.type);
-  const typeColor = getTypeColor(script.type) as any;
+  const typeColor = getTypeColor(script.type) as 'success' | 'warning' | 'danger' | 'info' | 'gold' | 'default';
   return (
     <div className="group bg-slate-800/50 rounded-xl border border-slate-700/50 overflow-hidden hover:border-indigo-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/10">
       <div className="aspect-video relative overflow-hidden">
