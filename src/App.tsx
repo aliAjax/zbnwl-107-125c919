@@ -6,6 +6,7 @@ import Rooms from "@/pages/Rooms";
 import Hosts from "@/pages/Hosts";
 import Customers from "@/pages/Customers";
 import Dashboard from "@/pages/Dashboard";
+import Memos from "@/pages/Memos";
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/rooms" element={<Rooms />} />
         <Route path="/hosts" element={<Hosts />} />
         <Route path="/customers" element={<Customers />} />
+        <Route path="/memos" element={<Memos />} />
       </Routes>
     </Router>
   );

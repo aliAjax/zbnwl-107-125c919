@@ -75,3 +75,15 @@ export interface ConflictResult {
 }
 
 export type ViewMode = 'day' | 'week' | 'month';
+export type MemoStatus = 'pending' | 'completed';
+export type MemoCategory = 'room' | 'props' | 'host' | 'customer' | 'other';
+
+export interface Memo {
+  id: string;
+  title: string;
+  content: string;
+  category: MemoCategory;
+  status: MemoStatus;
+  createdAt: string;
+  completedAt?: string;
+}
