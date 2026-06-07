@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { ScriptType, BadgeVariant } from '@/types';
+import type { ScriptType } from '@/types';
 import { getFromLocalStorage, setToLocalStorage } from '@/hooks/useLocalStorage';
 
 interface ScriptTypeState {

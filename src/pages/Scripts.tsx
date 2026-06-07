@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Plus, Search } from 'lucide-react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { ScriptCard } from '@/components/management/ScriptCard';
@@ -12,6 +12,7 @@ import type { Script } from '@/types';
 
 export default function Scripts() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingScript, setEditingScript] = useState<Script | null>(null);
 
@@ -33,11 +34,23 @@ export default function Scripts() {
   const updateScript = useScriptStore((s) => s.updateScript);
   const deleteScript = useScriptStore((s) => s.deleteScript);
 
-  const filteredScripts = scripts.filter(
-    (s) =>
-      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.type.includes(searchQuery)
+  const typeOptions = useMemo(
+    () => scriptTypes.map((t) => ({ value: t.name, label: t.name })),
+    [scriptTypes]
   );
+
+  const filterTypeOptions = useMemo(
+    () => [{ value: '', label: '全部类型' }, ...typeOptions],
+    [typeOptions]
+  );
+
+  const filteredScripts = scripts.filter((s) => {
+    const matchesSearch =
+      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.type.includes(searchQuery);
+    const matchesType = !typeFilter || s.type === typeFilter;
+    return matchesSearch && matchesType;
+  });
 
   const handleOpenModal = (script?: Script) => {
     if (script) {
@@ -88,8 +101,8 @@ export default function Scripts() {
           </Button>
         </div>
 
-        <div className="max-w-md">
-          <div className="relative">
+        <div className="flex flex-col sm:flex-row gap-4 max-w-2xl">
+          <div className="relative flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <Input
               placeholder="搜索剧本名称或类型..."
@@ -98,6 +111,12 @@ export default function Scripts() {
               className="pl-10"
             />
           </div>
+          <Select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            options={filterTypeOptions}
+            className="sm:w-48"
+          />
         </div>
 
         {filteredScripts.length > 0 ? (
@@ -137,7 +156,7 @@ export default function Scripts() {
               label="剧本类型"
               value={formData.type || defaultType}
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-              options={scriptTypes.map((t) => ({ value: t.name, label: t.name }))}
+              options={typeOptions}
             />
             <Select
               label="难度等级"
