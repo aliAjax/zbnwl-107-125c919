@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Plus } from 'lucide-react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { HostCard } from '@/components/management/HostCard';
@@ -6,9 +6,8 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { useHostStore } from '@/store/useHostStore';
+import { useScriptTypeStore } from '@/store/useScriptTypeStore';
 import type { Host } from '@/types';
-
-const allSpecialties = ['恐怖', '情感', '推理', '欢乐', '阵营'];
 
 export default function Hosts() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,6 +18,14 @@ export default function Hosts() {
     phone: '',
     specialty: []
   });
+
+  const activeTypes = useScriptTypeStore((s) => s.getActiveTypes());
+  const getTypeName = useScriptTypeStore((s) => s.getTypeName);
+
+  const allSpecialties = useMemo(() =>
+    activeTypes.map((t) => t.id),
+    [activeTypes]
+  );
 
   const hosts = useHostStore((s) => s.hosts);
   const addHost = useHostStore((s) => s.addHost);
@@ -136,22 +143,22 @@ export default function Hosts() {
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">擅长类型</label>
             <div className="flex flex-wrap gap-2">
-              {allSpecialties.map((specialty) => (
+              {activeTypes.map((type) => (
                 <label
-                  key={specialty}
+                  key={type.id}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-full border cursor-pointer transition-colors text-sm ${
-                    (formData.specialty || []).includes(specialty)
+                    (formData.specialty || []).includes(type.id)
                       ? 'bg-indigo-500/20 border-indigo-500/50 text-indigo-300'
                       : 'bg-slate-900/50 border-slate-600 text-slate-300 hover:border-slate-500'
                   }`}
                 >
                   <input
                     type="checkbox"
-                    checked={(formData.specialty || []).includes(specialty)}
-                    onChange={() => handleSpecialtyToggle(specialty)}
+                    checked={(formData.specialty || []).includes(type.id)}
+                    onChange={() => handleSpecialtyToggle(type.id)}
                     className="sr-only"
                   />
-                  <span>{specialty}</span>
+                  <span>{type.name}</span>
                 </label>
               ))}
             </div>

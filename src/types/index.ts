@@ -1,13 +1,20 @@
-export type ScriptType = '恐怖' | '情感' | '推理' | '欢乐' | '阵营' | '其他';
 export type Difficulty = 1 | 2 | 3 | 4 | 5;
 export type RoomStatus = 'available' | 'maintenance' | 'disabled';
 export type PaymentStatus = 'unpaid' | 'partial' | 'paid';
 export type SessionStatus = 'scheduled' | 'ongoing' | 'completed' | 'cancelled';
 
+export interface ScriptType {
+  id: string;
+  name: string;
+  sortOrder: number;
+  active: boolean;
+  color?: string;
+}
+
 export interface Script {
   id: string;
   name: string;
-  type: ScriptType;
+  type: string;
   difficulty: Difficulty;
   duration: number;
   minPlayers: number;

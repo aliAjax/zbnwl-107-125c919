@@ -1,6 +1,7 @@
 import { Edit, Trash2, Phone, Star } from 'lucide-react';
 import type { Host } from '@/types';
 import { Button } from '@/components/ui/Button';
+import { useScriptTypeStore } from '@/store/useScriptTypeStore';
 
 interface HostCardProps {
   host: Host;
@@ -9,6 +10,7 @@ interface HostCardProps {
 }
 
 export function HostCard({ host, onEdit, onDelete }: HostCardProps) {
+  const getTypeName = useScriptTypeStore((s) => s.getTypeName);
   return (
     <div className="group bg-slate-800/50 rounded-xl border border-slate-700/50 p-5 hover:border-indigo-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/10">
       <div className="flex items-start gap-4">
@@ -56,7 +58,7 @@ export function HostCard({ host, onEdit, onDelete }: HostCardProps) {
                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs"
               >
                 <Star size={10} className="fill-indigo-400" />
-                {spec}
+                {getTypeName(spec)}
               </span>
             ))}
           </div>

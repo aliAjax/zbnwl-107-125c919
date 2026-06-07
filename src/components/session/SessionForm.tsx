@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/Badge';
 import { checkConflicts } from '@/utils/conflictUtils';
 import { formatDurationMinutes } from '@/utils/dateUtils';
 import { useSessionStore } from '@/store/useSessionStore';
+import { useScriptTypeStore } from '@/store/useScriptTypeStore';
 
 interface SessionFormProps {
   initialData?: Session;
@@ -22,6 +23,7 @@ interface SessionFormProps {
 
 export function SessionForm({ initialData, presetDate, scripts, rooms, hosts, onSubmit, onCancel }: SessionFormProps) {
   const sessions = useSessionStore((s) => s.sessions);
+  const getTypeName = useScriptTypeStore((s) => s.getTypeName);
 
   const getDefaultStartTime = () => {
     if (initialData?.startTime) {
@@ -98,7 +100,7 @@ export function SessionForm({ initialData, presetDate, scripts, rooms, hosts, on
 
   const scriptOptions = scripts.map((s) => ({
     value: s.id,
-    label: `${s.name} (${s.type}, ${formatDurationMinutes(s.duration)})`
+    label: `${s.name} (${getTypeName(s.type)}, ${formatDurationMinutes(s.duration)})`
   }));
 
   const roomOptions = rooms
@@ -129,7 +131,7 @@ export function SessionForm({ initialData, presetDate, scripts, rooms, hosts, on
             {selectedScript ? (
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <Badge variant="info">{selectedScript.type}</Badge>
+                  <Badge variant="info">{getTypeName(selectedScript.type)}</Badge>
                   <span className="text-slate-400">
                     <Clock size={12} className="inline mr-1" />
                     {formatDurationMinutes(selectedScript.duration)}
